@@ -22,12 +22,15 @@ function AnotherAutoAssassinate.FindTarget(me, ability)
     local Ultimate = NPC.GetAbility(hero, "sniper_assassinate")
     local UltimateLevel = Ability.GetLevel(Ultimate)
 	local UltimateDamage = (UltimateLevel > 0) and 320+165*(UltimateLevel-1) or 0
-	
+	local DragonLance=0
+	if NPC.GetItem(me, "item_dragon_lance", true) or NPC.GetItem(me, "item_hurricane_pike", true) then
+	DragonLance = 140
+	end
 	local dagondmg = UltimateDamage + UltimateDamage * (Hero.GetIntellectTotal(me) / 16 / 100)
 	local entities = Heroes.GetAll()
 	for index, ent in pairs(entities) do
 		local enemyhero = Heroes.Get(index)
-		if not Entity.IsSameTeam(me, enemyhero) and not NPC.IsLinkensProtected(enemyhero) and not NPC.IsIllusion(enemyhero) and NPC.IsEntityInRange(me, enemyhero, Ability.GetCastRange(ability) + NPC.GetCastRangeBonus(me)) and not NPC.IsEntityInRange(me, enemyhero, NPC.GetAttackRange(me)) then
+		if not Entity.IsSameTeam(me, enemyhero) and not NPC.IsLinkensProtected(enemyhero) and not NPC.IsIllusion(enemyhero) and NPC.IsEntityInRange(me, enemyhero, Ability.GetCastRange(ability) + NPC.GetCastRangeBonus(me)) and not NPC.IsEntityInRange(me, enemyhero, NPC.GetAttackRange(me) + Ability.GetLevelSpecialValueFor(NPC.GetAbilityByIndex(me, 2), "bonus_attack_range")+DragonLance) then
 			local totaldmg = (1 - NPC.GetMagicalArmorValue(enemyhero)) * dagondmg
 			local isValid = AnotherAutoAssassinate.CheckForModifiers(enemyhero)
 			if Entity.GetHealth(enemyhero) < totaldmg and isValid then return enemyhero end
